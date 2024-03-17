@@ -1,0 +1,157 @@
+generator client {
+  provider = "prisma-client-js"
+  // previewFeatures = ["referentialIntegrity"] ... apparently this has been deprecated and is no longer required
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+  // referentialIntegrity = "prisma" ... apparently this has been deprecated in favour of 'relationMode = "prisma" '
+}
+
+model Enrolment {
+  id                         Int                   @id @default(autoincrement())
+  student_school             String
+  agree_tsa_terms            Boolean
+  student_first_name         String
+  student_surname            String
+  previous_student           Boolean
+  instrument                 String
+  inst_other                 String?
+  student_grade              String
+  student_medical            String
+  tuition_type               String
+  client_name                String
+  relationship               String?
+  client_street_address      String
+  client_city_suburb         String
+  client_state               String
+  client_postcode            String
+  client_email               String
+  hire_purchase_byo          String
+  inst_insurance             Boolean?
+  drivers_license_no         String?
+  nearest_relative_name      String?
+  nearest_relative_phone     String?
+  main_earner_name           String?
+  main_earner_mobile         String?
+  main_earner_employer_name  String?
+  main_earner_employer_phone String?
+  cc_payment_provider        String?
+  cc_name                    String?
+  cc_number                  String?
+  cc_expiry                  String?
+  cc_ccv                     String?
+  bank_country               String?
+  bank_name                  String?
+  bank_street_address        String?
+  bank_city_suburb           String?
+  bank_state                 String?
+  bank_postcode              String?
+  bank_bsb                   String?
+  bank_acc_name              String?
+  bank_acc_number            String?
+  agree_rental_terms         Boolean?
+  accessories                Accessory[]           @relation("Enrolment_Accessory")
+  enrolment_accessory        Enrolment_Accessory[]
+}
+
+model School {
+  id             Int              @id @default(autoincrement())
+  name           String           @unique
+  programs       Program[]        @relation("School_Program")
+  resource_levy  Int
+  facility_hire  Int
+  school_program School_Program[]
+}
+
+model Program {
+  id             Int              @id @default(autoincrement())
+  name           String           @unique
+  description    String
+  cost           Int
+  cost_breakdown Json
+  status         String
+  enrol_fee      Int
+  schools        School[]         @relation("School_Program")
+  school_program School_Program[]
+}
+
+model School_Program {
+  id         Int @id @default(autoincrement())
+  school_id  Int
+  program_id Int
+
+  school  School  @relation(fields: [school_id], references: [id])
+  program Program @relation(fields: [program_id], references: [id])
+
+  //   @@unique([programId, schoolId])
+  @@index([school_id])
+  @@index([program_id])
+}
+
+model Instrument {
+  id                   Int                    @id @default(autoincrement())
+  name                 String                 @unique
+  purchase_options     Json
+  hire_cost            Int
+  hire_insurance       Int
+  accessories          Accessory[]            @relation("Instrument_Accessory")
+  instrument_accessory Instrument_Accessory[]
+}
+
+model Accessory {
+  id                   Int                    @id @default(autoincrement())
+  name                 String                 @unique
+  description          String?
+  price                Decimal
+  image                String
+  instruments          Instrument[]           @relation("Instrument_Accessory")
+  instrument_accessory Instrument_Accessory[]
+  enrolments           Enrolment[]            @relation("Enrolment_Accessory")
+  enrolment_accessory  Enrolment_Accessory[]
+}
+
+model Instrument_Accessory {
+  id            Int @id @default(autoincrement())
+  instrument_id Int
+  accessory_id  Int
+
+  instrument Instrument @relation(fields: [instrument_id], references: [id])
+  accessory  Accessory  @relation(fields: [accessory_id], references: [id])
+
+  @@index([instrument_id])
+  @@index([accessory_id])
+}
+
+model Enrolment_Accessory {
+  id           Int @id @default(autoincrement())
+  enrolment_id Int
+  accessory_id Int
+
+  enrolment Enrolment @relation(fields: [enrolment_id], references: [id])
+  accessory Accessory @relation(fields: [accessory_id], references: [id])
+
+  @@index([enrolment_id])
+  @@index([accessory_id])
+}
+
+// model Product {
+//     id          Int       @id @default(autoincrement())
+//     name        String
+//     description String
+//     price       Decimal
+//     image       String
+//     category    Category? @relation(fields: [category_id], references: [id])
+//     category_id Int
+
+//     @@index([category_id])
+// }
+
+// model Category {
+//     id          Int       @id @default(autoincrement())
+//     name        String
+//     description String
+//     products    Product[]
+// }

@@ -1,0 +1,26 @@
+.container {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 8px;
+  height: 80%;
+  width: 80%;
+  max-width: 1200px;
+
+  @media (max-width: 30rem) {
+    height: 100%;
+    width: 100%;
+  }
+}
+
+.nav {
+  border: 1px solid black;
+  width: 20%;
+
+  @media (max-width: 30rem) {
+    display: none;
+  }
+}
